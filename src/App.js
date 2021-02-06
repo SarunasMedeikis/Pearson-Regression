@@ -2,7 +2,7 @@ import React from "react";
 import "./App.css";
 
 //Pearson's Correlation Coefficient
-function CalculatePCC({ data, setDataForDisplay }) {
+function CalculatePCC({ data, ShowTable, isCalculating }) {
   //Round number to the decimal place (1.2) instead of 1.222232222
   function roundToDecimal(number, places) {
     return (Math.round(number * 100) / 100).toFixed(places);
@@ -101,38 +101,68 @@ function CalculatePCC({ data, setDataForDisplay }) {
       );
     return result;
   }
+
+  //This will be used to pass data to ShowTable component.
+  const AllDataInside = {
+    x: data.x,
+    y: data.y,
+    meanX: meanXY.meanX,
+    meanY: meanXY.meanY,
+    XminusXbar: dataFromSquareCalculations.XminusXbar,
+    XminusXbarSquare: dataFromSquareCalculations.XminusXbarSquare,
+    YminusYbar: dataFromSquareCalculations.YminusYbar,
+    YminusYbarSquare: dataFromSquareCalculations.YminusYbarSquare,
+    sumOfMultiplyXYbar: dataFromSums.sumOfMultiplyXYbar,
+    sumOfXminusXbarSquare: dataFromSums.sumOfXminusXbarSquare,
+    sumOfYminusYbarSquare: dataFromSums.sumOfYminusYbarSquare,
+    multiplyXminusXbarYminusYbar:
+      dataFromSquareCalculations.multiplyXminusXbarYminusYbar,
+  };
+
   const CorrelationCoefficient = calculateCoef(dataFromSums).toFixed(3);
-  return <h1>Correlation Coefficient is : {CorrelationCoefficient}</h1>;
+  return (
+    <>
+      <h1>Correlation Coefficient is : {CorrelationCoefficient}</h1>
+      <ShowTable isCalculating={isCalculating} data={AllDataInside} />
+    </>
+  );
 }
 
-function App() {
-  const [data, setData] = React.useState({
-    x: ["17", "13", "12", "15", "16", "14", "16", "16", "18", "19"],
-    y: ["94", "73", "59", "80", "93", "85", "66", "79", "77", "91"],
-  });
-
-  React.useEffect(() => {
-    <ShowTable />;
-  }, [data]);
-
-  const [tempValues, setTempValues] = React.useState({ x: "", y: "" });
-  const [isCalculating, setIsCalculating] = React.useState(false);
-
-  function onChange(event) {
-    setTempValues({ ...tempValues, [event.target.name]: event.target.value });
-  }
-  function onSubmit(event) {
-    event.preventDefault();
-    console.log("CALLED ON SUBMIT");
-    let newArr = data;
-    newArr.x.push(tempValues.x);
-    newArr.y.push(tempValues.y);
-    console.log("NEWARR ", newArr);
-    setData(newArr);
-    setTempValues({ x: "", y: "" });
-  }
-
-  function ShowTable() {
+function ShowTable({ isCalculating, data }) {
+  if (isCalculating) {
+    console.log(data);
+    return (
+      <table>
+        <thead>
+          <tr>
+            <th colSpan="1">X</th>
+            <th colSpan="1">Y</th>
+            <th colSpan="1">(x-x̄)</th>
+            <th colSpan="1">(y-ȳ)</th>
+            <th colSpan="1">(x-x̄)*(y-ȳ)</th>
+            <th colSpan="1">(x-x̄)²</th>
+            <th colSpan="1">(y-ȳ)²</th>
+          </tr>
+        </thead>
+        <tbody>
+          {data.x.map((x, i) => {
+            return (
+              //Yes, This is bad practice for key, but for this instance is ok.
+              <tr key={i}>
+                <td>{x}</td>
+                <td>{data.y[i]}</td>
+                <td>{data.XminusXbar[i]}</td>
+                <td>{data.YminusYbar[i]}</td>
+                <td>{data.multiplyXminusXbarYminusYbar[i]}</td>
+                <td>{data.XminusXbarSquare[i]}</td>
+                <td>{data.YminusYbarSquare[i]}</td>
+              </tr>
+            );
+          })}
+        </tbody>
+      </table>
+    );
+  } else {
     return (
       <table>
         <thead>
@@ -155,6 +185,34 @@ function App() {
       </table>
     );
   }
+}
+
+function App() {
+  const [data, setData] = React.useState({
+    x: ["17", "13", "12", "15", "16", "14", "16", "16", "18", "19"],
+    y: ["94", "73", "59", "80", "93", "85", "66", "79", "77", "91"],
+  });
+
+  React.useEffect(() => {
+    <ShowTable data={data} />;
+  }, [data]);
+
+  const [tempValues, setTempValues] = React.useState({ x: "", y: "" });
+  const [isCalculating, setIsCalculating] = React.useState(false);
+
+  function onChange(event) {
+    setTempValues({ ...tempValues, [event.target.name]: event.target.value });
+  }
+  function onSubmit(event) {
+    event.preventDefault();
+    console.log("CALLED ON SUBMIT");
+    let newArr = data;
+    newArr.x.push(tempValues.x);
+    newArr.y.push(tempValues.y);
+    console.log("NEWARR ", newArr);
+    setData(newArr);
+    setTempValues({ x: "", y: "" });
+  }
 
   return (
     <div className="App">
@@ -162,11 +220,15 @@ function App() {
         <h1>Pearson Regression</h1>
         {isCalculating ? (
           <>
-            <CalculatePCC data={data} />
+            <CalculatePCC
+              data={data}
+              ShowTable={ShowTable}
+              isCalculating={isCalculating}
+            />
           </>
         ) : (
           <>
-            <ShowTable />
+            <ShowTable data={data} />
             <form onSubmit={onSubmit}>
               <label>Observation from dataset 1</label>
               <input
