@@ -110,19 +110,87 @@ function App() {
     x: ["17", "13", "12", "15", "16", "14", "16", "16", "18", "19"],
     y: ["94", "73", "59", "80", "93", "85", "66", "79", "77", "91"],
   });
+
+  React.useEffect(() => {
+    <ShowTable />;
+  }, [data]);
+
+  const [tempValues, setTempValues] = React.useState({ x: "", y: "" });
+  const [isCalculating, setIsCalculating] = React.useState(false);
+
+  function onChange(event) {
+    setTempValues({ ...tempValues, [event.target.name]: event.target.value });
+  }
+  function onSubmit(event) {
+    event.preventDefault();
+    console.log("CALLED ON SUBMIT");
+    let newArr = data;
+    newArr.x.push(tempValues.x);
+    newArr.y.push(tempValues.y);
+    console.log("NEWARR ", newArr);
+    setData(newArr);
+    setTempValues({ x: "", y: "" });
+  }
+
+  function ShowTable() {
+    return (
+      <table>
+        <thead>
+          <tr>
+            <th colSpan="1">X</th>
+            <th colSpan="1">Y</th>
+          </tr>
+        </thead>
+        <tbody>
+          {data.x.map((x, i) => {
+            return (
+              //Yes, This is bad practice for key, but for this instance is ok.
+              <tr key={i}>
+                <td>{x}</td>
+                <td>{data.y[i]}</td>
+              </tr>
+            );
+          })}
+        </tbody>
+      </table>
+    );
+  }
+
   return (
     <div className="App">
       <div className="App-header">
         <h1>Pearson Regression</h1>
-        <CalculatePCC data={data} />
-        <form>
-          <label>Observation from dataset 1</label>
-          <input type="text" placeholder="x" />
-          <label>Observation from dataset 2</label>
-          <input type="text" placeholder="y" />
-          <button type="button">Add</button>
-          <button type="button">Calculate</button>
-        </form>
+        {isCalculating ? (
+          <>
+            <CalculatePCC data={data} />
+          </>
+        ) : (
+          <>
+            <ShowTable />
+            <form onSubmit={onSubmit}>
+              <label>Observation from dataset 1</label>
+              <input
+                type="text"
+                placeholder="x"
+                name="x"
+                value={tempValues.x}
+                onChange={onChange}
+              />
+              <label>Observation from dataset 2</label>
+              <input
+                type="text"
+                placeholder="y"
+                name="y"
+                value={tempValues.y}
+                onChange={onChange}
+              />
+              <button type="submit">Add</button>
+            </form>
+            <button type="button" onClick={() => setIsCalculating(true)}>
+              Calculate
+            </button>
+          </>
+        )}
       </div>
     </div>
   );
