@@ -220,8 +220,7 @@ function App() {
 
   const [tempValues, setTempValues] = React.useState({ x: "", y: "" });
   const [isCalculating, setIsCalculating] = React.useState(false);
-  // Disabled for the Calculate button, so can disable easily, if the values are wrong.
-  const [disabled, setDisabled] = React.useState(false);
+  // Checking if user is trying to enter the unsupported value, meaning alphabetical letter
   const [isError, setIsError] = React.useState(false);
 
   function onChange(event) {
