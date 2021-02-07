@@ -220,9 +220,20 @@ function App() {
 
   const [tempValues, setTempValues] = React.useState({ x: "", y: "" });
   const [isCalculating, setIsCalculating] = React.useState(false);
+  // Disabled for the Calculate button, so can disable easily, if the values are wrong.
+  const [disabled, setDisabled] = React.useState(false);
+  const [isError, setIsError] = React.useState(false);
 
   function onChange(event) {
-    setTempValues({ ...tempValues, [event.target.name]: event.target.value });
+    // Check for only number input
+    const re = /^[0-9\b]+$/;
+
+    if (event.target.value !== "" && re.test(event.target.value)) {
+      setIsError(false);
+      setTempValues({ ...tempValues, [event.target.name]: event.target.value });
+    } else {
+      return setIsError(true);
+    }
   }
   function onSubmit(event) {
     event.preventDefault();
@@ -248,28 +259,35 @@ function App() {
         ) : (
           <>
             <ShowTable data={data} />
-            <form onSubmit={onSubmit}>
-              <label>Observation from dataset 1</label>
-              <input
-                type="text"
-                placeholder="x"
-                name="x"
-                value={tempValues.x}
-                onChange={onChange}
-              />
-              <label>Observation from dataset 2</label>
-              <input
-                type="text"
-                placeholder="y"
-                name="y"
-                value={tempValues.y}
-                onChange={onChange}
-              />
-              <button type="submit">Add</button>
-            </form>
-            <button type="button" onClick={() => setIsCalculating(true)}>
-              Calculate
-            </button>
+            {isError ? (
+              <p style={{ color: "red" }}>Can only input numbers</p>
+            ) : (
+              <></>
+            )}
+            <div className="formContainer">
+              <form onSubmit={onSubmit}>
+                <label>Observation from dataset 1</label>
+                <input
+                  type="text"
+                  placeholder="x"
+                  name="x"
+                  value={tempValues.x}
+                  onChange={onChange}
+                />
+                <label>Observation from dataset 2</label>
+                <input
+                  type="text"
+                  placeholder="y"
+                  name="y"
+                  value={tempValues.y}
+                  onChange={onChange}
+                />
+                <button type="submit">Add</button>
+              </form>
+              <button type="button" onClick={() => setIsCalculating(true)}>
+                Calculate
+              </button>
+            </div>
           </>
         )}
       </div>
