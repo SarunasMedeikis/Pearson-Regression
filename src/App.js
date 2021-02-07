@@ -210,8 +210,8 @@ function ShowTable({ isCalculating, data }) {
 
 function App() {
   const [data, setData] = React.useState({
-    x: ["17", "13", "12", "15", "16", "14", "16", "16", "18", "19"],
-    y: ["94", "73", "59", "80", "93", "85", "66", "79", "77", "91"],
+    x: [],
+    y: [],
   });
 
   React.useEffect(() => {
