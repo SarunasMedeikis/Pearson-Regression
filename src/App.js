@@ -12,10 +12,10 @@ function CalculatePCC({ data, ShowTable, isCalculating }) {
     let meanX = 0,
       meanY = 0;
     data.x.map((item) => {
-      meanX = meanX + parseInt(item);
+      meanX = meanX + parseFloat(item);
     });
     data.y.map((item) => {
-      meanY = meanY + parseInt(item);
+      meanY = meanY + parseFloat(item);
     });
     // console.log("meanX= ", meanX);
     // console.log("meanY= ", meanY);
@@ -226,7 +226,7 @@ function App() {
 
   function onChange(event) {
     // Check for only number input
-    const re = /^[0-9\b]+$/;
+    const re = /^[0-9.]*$/;
 
     if (event.target.value !== "" && re.test(event.target.value)) {
       setIsError(false);
