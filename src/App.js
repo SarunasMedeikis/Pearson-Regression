@@ -120,9 +120,30 @@ function CalculatePCC({ data, ShowTable, isCalculating }) {
   };
 
   const CorrelationCoefficient = calculateCoef(dataFromSums).toFixed(3);
+  console.log(Math.abs(CorrelationCoefficient));
+  // Tell level of correlation
+  function levelOfCorrelation(CorrelationCoefficient) {
+    //Use ABS in case coefficient is minus
+    const coef = Math.abs(CorrelationCoefficient);
+    if (coef === 0) {
+      return "No correlation";
+    } else if (coef < 0.29) {
+      return "Small Correlation";
+    } else if (coef >= 0.3 && coef < 0.49) {
+      return "Medium Correlation";
+    } else if (coef > 0.49 && coef < 1) {
+      return "Strong Correlation";
+    }
+  }
+
+  const levelOfCorrelationString = levelOfCorrelation(CorrelationCoefficient);
   return (
     <>
-      <h1>Correlation Coefficient is : {CorrelationCoefficient}</h1>
+      <h1>
+        Correlation Coefficient is : {CorrelationCoefficient}, there is a{" "}
+        {levelOfCorrelationString}
+      </h1>
+
       <ShowTable isCalculating={isCalculating} data={AllDataInside} />
     </>
   );
@@ -205,11 +226,9 @@ function App() {
   }
   function onSubmit(event) {
     event.preventDefault();
-    console.log("CALLED ON SUBMIT");
     let newArr = data;
     newArr.x.push(tempValues.x);
     newArr.y.push(tempValues.y);
-    console.log("NEWARR ", newArr);
     setData(newArr);
     setTempValues({ x: "", y: "" });
   }
